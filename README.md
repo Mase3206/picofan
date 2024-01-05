@@ -23,4 +23,4 @@ picofan has two software components:
 1. Pico code, written in MicroPython
 2. Companion device code, written in standard Python 3
 
-The two devices communicate via a [custom protocol](./protocol.md) over UART0 and use unique addresses to identify the command sender and recipient.
+The two devices communicate via a [custom protocol](./docs/protocol.md) over UART0 and use unique addresses to identify the command sender and recipient.
