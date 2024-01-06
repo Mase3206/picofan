@@ -1,3 +1,9 @@
+import serial, checksum
+
+
+# initial variables
+companionAddr = '0x01'
+
 class Fan():
 	import time
 
