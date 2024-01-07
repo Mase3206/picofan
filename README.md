@@ -1,5 +1,5 @@
 # picofan
-Picofan is a Raspberry Pi Pico (RP2040)-based fan controller supporting PWM fans, speed measurement, and automatic speed adjustment.
+Picofan is a Raspberry Pi Pico-based fan controller supporting PWM fans, speed measurement, and automatic speed adjustment. A RP2040-based PCB will be published in the future.
 
 ## Hardware Requirements
 
@@ -7,7 +7,7 @@ Picofan is a Raspberry Pi Pico (RP2040)-based fan controller supporting PWM fans
 
 Currenly, only PWM fans are supported due to their ease of digital control. Support for voltage-controlled fans may be implemented in the future.
 
-picofan is fan voltage-agnostic by controlling fan power with individual transistors. <!-- TODO: add info about board voltages when PCB and schematics are added to repo -->
+picofan is fan voltage-agnostic by controlling fan power with individual transistors. <!-- TODO: add info about board vcc voltages when PCB and schematics are added to repo -->
 
 ### Temperature Sensors
 
