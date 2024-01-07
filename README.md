@@ -15,7 +15,7 @@ Fan speed can be set to adjust automatically via a default or user-defined curve
 
 ### Control
 
-picofan can be controlled by any device with a UART interface. For my development, I am using a Raspberry Pi 3b, but theoretically any board would work fine. 
+picofan can be controlled by a Raspberry Pi 2 or later at the moment, but support for any device with a UART interface is planned. For my development, I am using a Raspberry Pi 3b. 
 
 ## Software
 

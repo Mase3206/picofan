@@ -1,52 +1,63 @@
-def make(message:list):
+import convert
+
+def make(byteList:list):
 	'''
 	checksum make
 
 	Parameters
 	----------
-	message - list of hex values, 1 byte (2 digits) each
+	byteList - list of hex string integers, 1 byte (2 digits) each (i.e. '0xfe', not 0xfe)
 
 	Returns
 	-------
-	checkByte - 1 byte hex
+	1 byte hex integer
 	'''
 
-	# byteList = []
-	# print(len(hex(message)))
-
-	# while message >= 0:
-	# 	byte = message % 0x100
-	# 	print(hex(byte))
-	# 	if byte != None: 
-	# 		byteList.append(byte)
-	# 	message = message // 0x100
-
-
 	# print([hex(byte) for byte in byteList])
-	# byteList = list(reversed(byteList))
 
-	byteList = message
+	evenPart = []
+	oddPart = []
+	for i in range(len(byteList)):
+		if i % 2 == 0:
+			evenPart.append(int(byteList[i], base=16))
+		else:
+			oddPart.append(int(byteList[i], base=16))
 
-	checkByte = 0
-	print([hex(byte) for byte in byteList])
+	evenPart = sum(evenPart) * 77
+	oddPart = sum(oddPart)
 
-	evenPart = sum([byte for byte in byteList if byte % 2 == 0]) * 6
-	oddPart = sum([byte for byte in byteList if byte % 2 == 1])
-
-	print(evenPart, oddPart)
+	# print(evenPart, oddPart)
 	bothParts = evenPart + oddPart
 
-	return hex(255 - (bothParts % 255)), len(byteList)
+	return f'0x{255 - (bothParts % 255):02x}'
 
 
 
+def verify(fullMessage:str):
+	byteList = convert.splitHexBytes(fullMessage)
+	message = byteList[1:-2]
+	receivedCheck = int(byteList[-2], base=16)
+	computedCheck = int(make(message), base=16)
 
-	return hex(abs(checkByte)), len(byteList)
+	if receivedCheck == computedCheck:
+		return True
+	else:
+		return False
+	
 
 
-print()
-print(make([0x01, 0x0a, 0x01, 0x01, 0x01, 0x01]))
-print()
-print(make([0xff, 0x00, 0xff, 0x00, 0xff, 0x00]))
-print()
-print(make([0x00, 0xff, 0x00, 0xff, 0x00, 0xff]))
+if __name__ == '__main__':
+	print()
+	print(make(['0x01', '0x0a', '0x01', '0x01', '0x01', '0x01']))
+	print()
+	print(make(['0xff', '0x00', '0xff', '0x00', '0xff', '0x00']))
+	print()
+	print(make(['0x00', '0xff', '0x00', '0xff', '0x00', '0xff']))
+
+
+	# print()
+	# print(splitHexBytes('0x010a01010101'))
+
+
+	print()
+	print(convert.joinHexBytes(['0x01', '0x0a', '0x01', '0x01', '0x01', '0x01']))

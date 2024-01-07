@@ -1,0 +1,12 @@
+{
+	"recommendations": [
+		"calcoph.vscode-hexpat",
+		"visualstudioexptteam.vscodeintellicode",
+		"visualstudioexptteam.intellicode-api-usage-examples",
+		"ms-python.vscode-pylance",
+		"ms-python.python",
+		"donjayamanne.python-environment-manager",
+		"donjayamanne.python-extension-pack",
+		"ms-vscode-remote.remote-ssh"
+	]
+}
