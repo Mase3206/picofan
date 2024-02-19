@@ -2,8 +2,8 @@ import serial, checksum, convert
 
 
 # initial variables
-companionAddr = '0x01'
-UARTport = '/dev/ttyAMA0'
+companionAddr = 'comp0'
+UARTport = '/dev/tty.usbmodem143301'
 
 # uart0 = serial.Serial(UARTport, 19200, timeout=1, parity='PARITY_EVEN')
 # uart0.open()
