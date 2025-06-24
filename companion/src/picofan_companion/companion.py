@@ -1,16 +1,36 @@
-import serial, convert, os
+import serial
+import os
+import json
+from typing import Any
+
+
+class JsonSerial(serial.Serial):
+	'''
+	Wrapper around PySerial's `serial.Serial` class which adds support for reading and writing null-terminated JSON over UART.
+	'''
+
+	def write_json(self, data: dict):
+		buf = json.dumps(data).encode('utf-8') + b'\0'
+		return super().write(buf)
+
+	def read_json(self) -> dict:
+		ret = super().read_until(
+			expected = b'\0', 
+			size = None
+		)
+		return json.loads(str(ret, encoding='utf-8')[:-1])
+
 
 
 # initial variables
 companionAddr = 'comp0'
 UARTport = '/dev/ttyAMA0'
 
-uart0 = serial.Serial(UARTport, 19200, timeout=1, parity=serial.PARITY_EVEN)
+uart0 = JsonSerial(UARTport, 19200, timeout=1, parity=serial.PARITY_EVEN)
 uart0.open()
 
-class Fan():
-	import time
 
+class Fan:
 	# Initialize variables
 	def __init__(self, picoAddress:str, fanNumber:int, powerCtrlPin:int, pwmPin:int, tachPin:int):
 		self.picoAddr = picoAddress
@@ -50,7 +70,7 @@ class Fan():
 			'speed': speed
 		}
 
-		uart0.write(message)
+		uart0.write_json(message)
 		print(message)
 		# self.state['setSpeed'] = speed
 		
@@ -66,9 +86,8 @@ class Fan():
 			'getInfo': 'state'
 		}
 
-		uart0.write(message)
-
-		return self.state
+		uart0.write_json(message)
+		return uart0.read_json()
 	
 
 	def getInfo(self):
