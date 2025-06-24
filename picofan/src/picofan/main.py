@@ -8,7 +8,7 @@ print(sys.path)
 
 from machine import Pin, ADC, PWM
 import time, math
-import sensors
+from picofan import sensors
 
 
 fanTach = Pin(5, Pin.IN)

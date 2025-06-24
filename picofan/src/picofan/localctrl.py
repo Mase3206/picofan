@@ -1,12 +1,12 @@
 from machine import Pin, ADC, PWM
 import time, math
-import sensors
+from picofan import sensors
 
 
 
 fanTach = Pin(5, Pin.IN)
 fanPWM = PWM(Pin(4, Pin.OUT), freq=1000, duty_u16=0)
-temp_probe = ADC(Pin(26, Pin.IN))
+temp_probe = Pin(26, Pin.IN)
 
 
 # Voltage Divider
@@ -33,7 +33,7 @@ def calculateSpeed(temperature:float) -> float:
 
 
 while True:
-    temperature = getTemp(temp_probe)
+    temperature = temp0.get()
     
     if temperature <= min_temp:
         speed = min_fanSpeed
