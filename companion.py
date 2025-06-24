@@ -1,12 +1,12 @@
-import serial, checksum, convert
+import serial, convert, os
 
 
 # initial variables
 companionAddr = 'comp0'
-UARTport = '/dev/tty.usbmodem143301'
+UARTport = '/dev/ttyAMA0'
 
-# uart0 = serial.Serial(UARTport, 19200, timeout=1, parity='PARITY_EVEN')
-# uart0.open()
+uart0 = serial.Serial(UARTport, 19200, timeout=1, parity=serial.PARITY_EVEN)
+uart0.open()
 
 class Fan():
 	import time
@@ -18,54 +18,55 @@ class Fan():
 		self.pin_pwm = pwmPin			# output
 		self.pin_tach = tachPin			# input
 		self.fanNumber = fanNumber
-		self.state = {		# this is only present for local testing. In real operation, these values would be fetched from the pico via uart0.
-			'setSpeed': 0.0,
-			'isOn': False,
-		}
+		# self.state = {		# this is only present for local testing. In real operation, these values would be fetched from the pico via uart0.
+		# 	'setSpeed': 0.0,
+		# 	'isOn': False,
+		# }
 
 		# send init command to Pico
-		message = ['0xfd', companionAddr, self.picoAddr, '0x01', '0x01', f'0x{self.fanNumber:02x}', f'0x{self.pin_power:02x}', f'0x{self.pin_pwm:02x}', f'0x{self.pin_tach:02x}', '', '0xfe', '0x00', '0x00', '0x00', '0x00', '0x00']
-		print(message[1:-8])
-		message[-7] = checksum.make(message[1:-8])
-		message = bytes(convert.joinHexBytes(message), 'utf-8')
+		message = {
+			'command': 'initDevice',
+			'type': 'fan',
+			'addr': '0',
+			'pins': {
+				'out_power': 4,
+				'out_pwm': 6,
+				'in_tach': 5
+			}
+		}
 		# uart0.write(message)
 		print(message)
 
 
-	def assembleMessage(self, command:str, value:float):
-		value = int(value * 255)
-
-		if command == 'set':
-			message = ['0xfd', companionAddr, self.picoAddr, '0x03', '0x01', f'0x{self.fanNumber:02x}', f'0x{value:02x}', '', '0xfe', '0x00', '0x00', '0x00', '0x00', '0x00', '0x00', '0x00']
-			print(message)
-		if command == 'get':
-			message = ['0xfd', companionAddr, self.picoAddr, '0x04', '0x01', f'0x{self.fanNumber:02x}', f'0x{value:02x}', '', '0xfe', '0x00', '0x00', '0x00', '0x00', '0x00', '0x00', '0x00']
-			print(message)
-		message[-9] = (checksum.make(message[1:-10]))
-		return message
-
-
 	# Define speed set method
-	def set(self, speed:float):
-		if speed >= 0.0 or speed <= 1.0:
-			message = convert.joinHexBytes(self.assembleMessage('set', speed))
-			message = bytes(message, 'utf-8')
-			# uart0.write(message)
-			print(message)
-			self.state['setSpeed'] = speed
-			print(f'Fan {self.fanNumber}: set speed = {speed * 100}%')
-			
-			return speed
+	def setSpeed(self, speed:float):
+		if speed < 0.0 or speed > 1.0:
+			raise ValueError(f'Given speed {speed} out of accepted range')
 		
-		else:
-			raise ValueError(f'Fan {self.fanNumber}: speed must be type(float) from 0.0 to 1.0. Given: speed = {speed}')
+		message = {
+			'command': 'set',
+			'type': 'fan',
+			'addr': '0',
+			'speed': speed
+		}
+
+		uart0.write(message)
+		print(message)
+		# self.state['setSpeed'] = speed
+		
+		return speed
+
 
 
 	def getState(self):
-		# print(f'Fan {self.fanNumber}: get state:')
-		# print('\tisOn =', self.state['isOn'])
-		# print('\tsetSpeed =', self.state['setSpeed'])
-		# print()
+		message = {
+			'command': 'get',
+			'type': 'fan',
+			'addr': 0,
+			'getInfo': 'state'
+		}
+
+		uart0.write(message)
 
 		return self.state
 	
@@ -97,4 +98,5 @@ intake1 = Fan('0x02', 1, 4, 5, 6)
 # print(intake1.getState())
 # print(intake1.getInfo())
 
-intake1.set(0.0)
+# intake1.set(0.0)
+# os.
