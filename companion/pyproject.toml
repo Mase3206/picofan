@@ -1,0 +1,18 @@
+[project]
+name = "picofan_companion"
+version = "0.1.0"
+description = "The companion to the Raspberry Pi Pico-based fan controller."
+authors = [
+    {name = "Mase3206",email = "35052448+Mase3206@users.noreply.github.com"}
+]
+license = {text = "GPL-3.0-or-later"}
+# readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "pyserial (>=3.5,<4.0)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"

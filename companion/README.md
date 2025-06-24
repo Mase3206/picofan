@@ -1,0 +1,1 @@
+This folder contains the network-connected controller-side (companion) of things.
