@@ -19,93 +19,75 @@ class JsonSerial(serial.Serial):
 
 
 # initial variables
-companionAddr = "comp0"
-UARTport = "/dev/ttyAMA0"
+uart_port = "/dev/ttyAMA0"
 
-uart0 = JsonSerial(UARTport, 19200, timeout=1, parity=serial.PARITY_EVEN)
+uart0 = JsonSerial(uart_port, 19200, timeout=1, parity=serial.PARITY_EVEN)
 uart0.open()
 
 
 class Fan:
-    # Initialize variables
     def __init__(
         self,
-        picoAddress: str,
-        fanNumber: int,
-        powerCtrlPin: int,
-        pwmPin: int,
-        tachPin: int,
+        number: int,
+        pin_power_control: int,
+        pin_pwm: int,
+        pin_tach: int,
     ):
-        self.picoAddr = picoAddress
-        self.pin_power = powerCtrlPin  # output
-        self.pin_pwm = pwmPin  # output
-        self.pin_tach = tachPin  # input
-        self.fanNumber = fanNumber
-        # self.state = {		# this is only present for local testing. In real operation, these values would be fetched from the pico via uart0.
-        # 	'setSpeed': 0.0,
-        # 	'isOn': False,
-        # }
+        """
+        Companion to the picofan.things.Fan class.
 
-        # send init command to Pico
+        Arguments
+        ---------
+            number (int) : the number of this fan
+            pin_power (int) : pin used to control the fan's power through a transistor or MOSFET
+            pin_tach (int) : pin used to read tachometer data
+            pin_pwm (int) : pin used to control the fan's PWM duty-cycle
+        """
+        self.pin_power = pin_power_control  # output
+        self.pin_pwm = pin_pwm  # output
+        self.pin_tach = pin_tach  # input
+        self.number = number
+
+        # send init command to pico
         message = {
             "command": "register",
             "kind": "fan",
-            "addr": "0",
+            "addr": self.number,
             "kwargs": {"pwm_pin": self.pin_pwm, "tach_pin": self.pin_tach},
         }
-        # uart0.write(message)
+        uart0.write_json(message)
         print(message)
 
-    # Define speed set method
-    def setSpeed(self, speed: float):
+    def set_speed(self, speed: float):
         if speed < 0.0 or speed > 1.0:
             raise ValueError(f"Given speed {speed} out of accepted range")
 
         message = {
             "command": "set",
             "kind": "fan",
-            "addr": "0",
+            "addr": self.number,
             "param": {"name": "speed", "value": speed},
         }
 
         uart0.write_json(message)
         print(message)
-        # self.state['setSpeed'] = speed
 
         return speed
 
-    def getState(self):
+    def get_state(self):
         message = {
             "command": "get",
             "kind": "fan",
-            "addr": 0,
+            "addr": self.number,
         }
 
         uart0.write_json(message)
         return uart0.read_json()
 
-    def getInfo(self):
-        # print(f'Fan {self.fanNumber}: get info:')
-        # print('\tpico address =', self.addr)
-        # print('\tpins:')
-        # print('\t\tpower =', self.pin_power)
-        # print('\t\tPWM =', self.pin_pwm)
-        # print('\t\ttach =', self.pin_tach)
-        # print()
-
-        info = {
-            "addr": self.picoAddr,
-            "pins": {
-                "power": self.pin_power,
-                "pwm": self.pin_pwm,
-                "tach": self.pin_tach,
-            },
-        }
-        return info
-
 
 # Initialize intake fan 1
-intake1 = Fan("0x02", 1, 4, 5, 6)
+intake1 = Fan(1, 4, 5, 6)
+
 
 # print(intake1.getState())
 # print(intake1.getInfo())

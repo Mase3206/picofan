@@ -22,3 +22,5 @@ reportMissingModuleSource = false
 [tool.poetry.group.dev.dependencies]
 pyyaml = "^6.0.2"
 micropython-rp2-stubs = ">=1.24.0,<2.0.0"
+ruff = "^0.12.0"
+isort = "^6.0.1"
