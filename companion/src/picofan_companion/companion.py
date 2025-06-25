@@ -1,7 +1,6 @@
-import serial
-import os
 import json
-from typing import Any
+
+import serial
 
 
 class JsonSerial(serial.Serial):

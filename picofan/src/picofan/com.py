@@ -5,25 +5,26 @@
 
 from __future__ import annotations
 
-from machine import UART, Pin
 import json
+
+from machine import UART
 
 
 class JsonSerial(UART):
-    '''
+    """
     Wrapper around MicroPython's `machine.UART` class, which adds support for reading and writing newline-terminated JSON over UART.
-    '''
+    """
 
     def __init__(self, id, *args, **kwargs) -> None:
         super().__init__(id, *args, **kwargs)
-    
+
     def irq(self, *args, **kwargs):
         self._irq = super().irq(*args, **kwargs)
 
     def write_json(self, data: dict):
-        buf = json.dumps(data).encode('utf-8') + b'\n'
+        buf = json.dumps(data).encode("utf-8") + b"\n"
         return super().write(buf)
-    
+
     def read_json(self) -> dict:
         ret = super().readline()
         if isinstance(ret, str):
