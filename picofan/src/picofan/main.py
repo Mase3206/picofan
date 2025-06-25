@@ -8,7 +8,11 @@ print(sys.path)
 
 from machine import Pin
 import time
-from picofan import things
+from picofan import things, com
+
+
+UART0 = com.JsonSerial(0, 19200, tx=Pin(1), rx=Pin(2), parity=0, )
+
 
 
 # initialize Thermistor and Fan objects

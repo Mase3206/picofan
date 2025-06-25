@@ -10,7 +10,7 @@ license = {text = "GPL-3.0-or-later"}
 requires-python = ">=3.12,<4.0"
 dependencies = [
     "pyserial (>=3.5,<4.0)",
-    "micropython-rp2-pico-stubs (>=1.20.0.post5,<2.0.0)",
+    "micropython-rp2-stubs (>=1.24.0,<2.0.0)",
 ]
 
 
