@@ -6,16 +6,16 @@ from typing import Any
 
 class JsonSerial(serial.Serial):
 	'''
-	Wrapper around PySerial's `serial.Serial` class which adds support for reading and writing null-terminated JSON over UART.
+	Wrapper around PySerial's `serial.Serial` class which adds support for reading and writing newline-terminated JSON over UART.
 	'''
 
 	def write_json(self, data: dict):
-		buf = json.dumps(data).encode('utf-8') + b'\0'
+		buf = json.dumps(data).encode('utf-8') + b'\n'
 		return super().write(buf)
 
 	def read_json(self) -> dict:
 		ret = super().read_until(
-			expected = b'\0', 
+			expected = b'\n', 
 			size = None
 		)
 		return json.loads(str(ret, encoding='utf-8')[:-1])
