@@ -2,8 +2,11 @@
 Contains classes for thermistors, switches, knobs, fans, etc. Any "thing" that this uses for input or output. Also some software things which link two or more hardware things.
 '''
 
+from __future__ import annotations
 import math
 from machine import Pin, ADC, PWM
+from enum import StrEnum, Enum
+from typing import Any
 
 
 class Thermistor:
@@ -40,9 +43,16 @@ class Fan:
     tach: Pin
     pwm: PWM
 
-    def __init__(self, tach_pin: Pin, pwm_pin: Pin):
-        self.tach = tach_pin
-        self.pwm = PWM(pwm_pin, freq=1000, duty_u16=0)
+    def __init__(self, tach_pin: Pin | int, pwm_pin: Pin | int):
+        if isinstance(tach_pin, Pin):
+            self.tach = tach_pin
+        else:
+            self.tach = Pin(tach_pin, mode=Pin.OUT)
+
+        if isinstance(pwm_pin, Pin):
+            self.pwm = PWM(pwm_pin, freq=1000, duty_u16=0)
+        else:
+            self.pwm = PWM(Pin(pwm_pin, mode=Pin.IN), freq=1000, duty_u16=0)
 
 
     @property
@@ -50,8 +60,8 @@ class Fan:
         return self.pwm.duty_u16() / 65535
 
     @speed.setter
-    def speed(self, percentage: float | Thermistor):
-        self.pwm.duty_u16(percentage)
+    def speed(self, percentage: float):
+        self.pwm.duty_u16(int(percentage * 100))
 
 
 
@@ -82,3 +92,48 @@ class FanCurve:
         for fan in self.fans:
             fan.speed = speed
         return speed
+
+
+
+
+class ThingKind(StrEnum):
+    FAN = 'fan'
+    THERMISTOR = 'temp'
+    CURVE = 'curve'
+
+    @staticmethod
+    def get_thing_class(kind: ThingKind):
+        match kind:
+            case ThingKind.FAN: return Fan
+            case ThingKind.THERMISTOR: return Thermistor
+            case ThingKind.CURVE: return FanCurve
+
+
+
+class ThingsManager:
+    _things: dict[str, dict[int, object]]
+    _instance = None
+
+    def __init__(self): 
+        self._things = {
+            'temp': {},
+            'fan': {},
+            'curve': {},
+        }
+
+
+    def __new__(cls, *args, **kwargs):
+        '''Singleton enforcement.'''
+        if not isinstance(cls._instance, cls):
+            cls._instance = object.__new__(cls, *args, **kwargs)
+        return cls._instance
+
+
+
+    def register(self, kind: ThingKind, address: int, thing: Any) -> Any:
+        '''Register the thing and return its instance.'''
+        self._things[kind][address] = thing
+        return thing
+    
+    def get(self, kind: ThingKind, address: int) -> Any:
+        return self._things[kind].get(address)

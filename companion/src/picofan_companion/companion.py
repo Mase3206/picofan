@@ -45,13 +45,12 @@ class Fan:
 
 		# send init command to Pico
 		message = {
-			'command': 'initDevice',
-			'type': 'fan',
+			'command': 'register',
+			'kind': 'fan',
 			'addr': '0',
-			'pins': {
-				'out_power': 4,
-				'out_pwm': 6,
-				'in_tach': 5
+			'kwargs': {
+				'pwm_pin': 6,
+				'tach_pin': 5
 			}
 		}
 		# uart0.write(message)
@@ -65,9 +64,12 @@ class Fan:
 		
 		message = {
 			'command': 'set',
-			'type': 'fan',
+			'kind': 'fan',
 			'addr': '0',
-			'speed': speed
+			'param': {
+				'name': 'speed',
+				'value': speed
+			}
 		}
 
 		uart0.write_json(message)
@@ -81,9 +83,8 @@ class Fan:
 	def getState(self):
 		message = {
 			'command': 'get',
-			'type': 'fan',
+			'kind': 'fan',
 			'addr': 0,
-			'getInfo': 'state'
 		}
 
 		uart0.write_json(message)
